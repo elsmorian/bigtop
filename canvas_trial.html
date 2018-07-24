@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <script type="application/javascript">
+
+    const pixel_grid_x = 35 // number of pixels along width 
+    const pixel_grid_y = 7 // number of pixels along height
+    const pixel_screen_multiplier = 20 // how many screen pixels to one real world pixel
+
+    var canvas;
+    var pixel_grid = [];
+
+    function draw_blank_grid() {
+      if (canvas.getContext) {
+        var ctx = canvas.getContext('2d');
+
+        ctx.fillStyle="#000000";
+        ctx.fillRect(0,0, canvas.width, canvas.height);
+        ctx.strokeStyle="#FFFFFF";
+        for (var y = 0; y <= pixel_grid_y; y++){
+          for (var x = 0; x <= pixel_grid_x; x++){
+            ctx.strokeRect(x*pixel_screen_multiplier, y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
+          }
+        }
+      }
+    }
+
+    function init_pixel_grid() {
+
+      for (var x = 0; x <= pixel_grid_x; x++){
+        pixel_grid[x] = [];
+        for (var y = 0; y <= pixel_grid_y; y++){
+          pixel_grid[x][y]="0,0,0";
+        }
+      }
+    }
+
+    function doMouseDown(event) {
+      var rect = canvas.getBoundingClientRect();
+      var screen_x = event.clientX - rect.left;
+      var screen_y = event.clientY - rect.top;
+      var pixel_x = Math.floor(screen_x/pixel_screen_multiplier)
+      var pixel_y = Math.floor(screen_y/pixel_screen_multiplier)
+      //console.log("X:" + Math.floor(clicked_x/20) + ", Y:" + Math.floor(clicked_y/20) + ", was clicked");
+      var ctx = canvas.getContext('2d');
+      if (pixel_grid[pixel_x][pixel_y] === "0,0,0") {
+        pixel_grid[pixel_x][pixel_y] = "255,255,255";
+        ctx.fillStyle="#FFFFFF";
+        ctx.fillRect(pixel_x*pixel_screen_multiplier, pixel_y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
+      } else {
+        ctx.fillStyle="#000000";
+        ctx.strokeStyle="#FFFFFF";
+        pixel_grid[pixel_x][pixel_y] = "0,0,0";
+        ctx.fillRect(pixel_x*pixel_screen_multiplier, pixel_y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
+        ctx.strokeRect(pixel_x*pixel_screen_multiplier, pixel_y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
+      }
+    }
+
+    function init() {
+      canvas = document.getElementById('canvas');
+
+      draw_blank_grid();
+      init_pixel_grid();
+
+      canvas.addEventListener('mousedown', doMouseDown);
+    }
+
+  </script>
+ </head>
+ <body onload="init();">
+   <canvas id="canvas" width="700" height="140"></canvas>
+ </body>
+</html>
