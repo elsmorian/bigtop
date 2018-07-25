@@ -5,6 +5,8 @@ edit /etc/fstab, add:
 tmpfs /var/ipc  tmpfs defaults,noatime,size=16m 0 0
 
 
+setup UFW
+
  sudo apt-get install \
      apt-transport-https \
      ca-certificates \

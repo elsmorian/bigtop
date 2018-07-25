@@ -2,6 +2,7 @@
 <html>
  <head>
   <meta charset="utf-8"/>
+  <link rel="stylesheet" href="css/spectre.min.css">
   <script type="application/javascript">
 
     const pixel_grid_x = 35 // number of pixels along width 
@@ -18,22 +19,47 @@
         ctx.fillStyle="#000000";
         ctx.fillRect(0,0, canvas.width, canvas.height);
         ctx.strokeStyle="#FFFFFF";
-        for (var y = 0; y <= pixel_grid_y; y++){
-          for (var x = 0; x <= pixel_grid_x; x++){
+        for (var y = 0; y < pixel_grid_y; y++){
+          for (var x = 0; x < pixel_grid_x; x++){
             ctx.strokeRect(x*pixel_screen_multiplier, y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
           }
         }
       }
     }
 
-    function init_pixel_grid() {
+    function draw_grid_from_pixels() {
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle="#000000";
+      ctx.fillRect(0,0, canvas.width, canvas.height);
+      
+      for (var pixel_y = 0; pixel_y < pixel_grid_y; pixel_y++){
+        for (var pixel_x = 0; pixel_x < pixel_grid_x; pixel_x++){
+          if (pixel_grid[pixel_x][pixel_y] === "255,255,255") {
+            ctx.fillStyle="#FFFFFF";
+            ctx.fillRect(pixel_x*pixel_screen_multiplier, pixel_y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
+          } else {
+            ctx.fillStyle="#000000";
+            ctx.strokeStyle="#FFFFFF";
+            ctx.fillRect(pixel_x*pixel_screen_multiplier, pixel_y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
+            ctx.strokeRect(pixel_x*pixel_screen_multiplier, pixel_y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
+          }
+        }
+      }
+    }
 
-      for (var x = 0; x <= pixel_grid_x; x++){
+    function init_pixel_grid() {
+      for (var x = 0; x < pixel_grid_x; x++){
         pixel_grid[x] = [];
-        for (var y = 0; y <= pixel_grid_y; y++){
+        for (var y = 0; y < pixel_grid_y; y++){
           pixel_grid[x][y]="0,0,0";
         }
       }
+    }
+
+    function shift_pixel_grid_right(){
+      new_array = pixel_grid.slice(0, -1);
+      new_array.splice(0, 0, pixel_grid[pixel_grid_x - 1]);
+      pixel_grid = new_array;
     }
 
     function doMouseDown(event) {
@@ -66,9 +92,26 @@
       canvas.addEventListener('mousedown', doMouseDown);
     }
 
+    function shift_right() {
+      shift_pixel_grid_right();
+      draw_grid_from_pixels();
+    }
+
   </script>
  </head>
  <body onload="init();">
-   <canvas id="canvas" width="700" height="140"></canvas>
+  <div class="container" style="width:80%;">
+   <div class="columns">
+    <div class="column col-12">
+     <canvas id="canvas" width="700" height="140"></canvas>
+    </div>
+   </div>
+   <div class="columns col-oneline">
+    <div class="column col-3"><button onclick="shift_right()">shift right</button></div>
+    <div class="column col-3">two</div>
+    <div class="column col-3">three</div>
+    <div class="column col-3">four</div>
+   </div>
+  </div> 
  </body>
 </html>
