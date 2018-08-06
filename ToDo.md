@@ -20,4 +20,6 @@ echo "deb [arch=armhf] https://download.docker.com/linux/debian \
      $(lsb_release -cs) stable" | \
     sudo tee /etc/apt/sources.list.d/docker.list
 
+
+enable SPI and I2C on interface in raspi-config under Advanced
     

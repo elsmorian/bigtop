@@ -2,7 +2,8 @@
 <html>
  <head>
   <meta charset="utf-8"/>
-  <link rel="stylesheet" href="css/spectre.min.css">
+  <link rel="stylesheet" href="static/css/spectre.min.css">
+  <script src="static/js/jscolor.js"></script>
   <script type="application/javascript">
 
     const pixel_grid_x = 35 // number of pixels along width 
@@ -11,6 +12,9 @@
 
     var canvas;
     var pixel_grid = [];
+    var frame_store = [];
+    var current_frame = 0;
+    var current_colour = "";
 
     function draw_blank_grid() {
       if (canvas.getContext) {
@@ -34,8 +38,8 @@
       
       for (var pixel_y = 0; pixel_y < pixel_grid_y; pixel_y++){
         for (var pixel_x = 0; pixel_x < pixel_grid_x; pixel_x++){
-          if (pixel_grid[pixel_x][pixel_y] === "255,255,255") {
-            ctx.fillStyle="#FFFFFF";
+          if (pixel_grid[pixel_x][pixel_y] !== "0,0,0") {
+            ctx.fillStyle="rgb(" + pixel_grid[pixel_x][pixel_y] + ")";
             ctx.fillRect(pixel_x*pixel_screen_multiplier, pixel_y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
           } else {
             ctx.fillStyle="#000000";
@@ -48,12 +52,18 @@
     }
 
     function init_pixel_grid() {
+      var blank_pixel_grid = [];
       for (var x = 0; x < pixel_grid_x; x++){
-        pixel_grid[x] = [];
+        blank_pixel_grid[x] = [];
         for (var y = 0; y < pixel_grid_y; y++){
-          pixel_grid[x][y]="0,0,0";
+          blank_pixel_grid[x][y]="0,0,0";
         }
       }
+      return blank_pixel_grid;
+    }
+
+    function init_frame_store() {
+      frame_store[0] = pixel_grid;
     }
 
     function shift_pixel_grid_right(){
@@ -71,8 +81,8 @@
       //console.log("X:" + Math.floor(clicked_x/20) + ", Y:" + Math.floor(clicked_y/20) + ", was clicked");
       var ctx = canvas.getContext('2d');
       if (pixel_grid[pixel_x][pixel_y] === "0,0,0") {
-        pixel_grid[pixel_x][pixel_y] = "255,255,255";
-        ctx.fillStyle="#FFFFFF";
+        pixel_grid[pixel_x][pixel_y] = current_colour;
+        ctx.fillStyle = "rgb(" + current_colour + ")";
         ctx.fillRect(pixel_x*pixel_screen_multiplier, pixel_y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
       } else {
         ctx.fillStyle="#000000";
@@ -83,12 +93,16 @@
       }
     }
 
+    function set_current_colour(rgb_colour_array) {
+      current_colour = rgb_colour_array.map(Math.round).join();
+    }
+
     function init() {
       canvas = document.getElementById('canvas');
 
       draw_blank_grid();
-      init_pixel_grid();
-
+      pixel_grid = init_pixel_grid();
+      init_frame_store()
       canvas.addEventListener('mousedown', doMouseDown);
     }
 
@@ -97,20 +111,60 @@
       draw_grid_from_pixels();
     }
 
+    function load_next_frame() {
+      if (frame_store.length - 1 === current_frame) {
+        // We are at the end of the frames
+        console.log("No more frames! Maybe make a new one?")
+      }
+      else {
+        current_frame++;
+        pixel_grid = frame_store[current_frame];
+      }
+      draw_grid_from_pixels();
+    }
+
+    function load_previous_frame() {
+      current_frame--;
+      pixel_grid = frame_store[current_frame];
+      draw_grid_from_pixels();
+    }
+
+    function make_new_frame() {
+      frame_store[current_frame + 1] = init_pixel_grid();
+    }
+
+    function send_animation() {
+      var xhttp = new XMLHttpRequest();
+      xhttp.open("POST", "127.0.0.1:5000/postdata", true);
+      xhttp.send("{\"bob\":\"fish\"}");
+    }
+
   </script>
  </head>
  <body onload="init();">
-  <div class="container" style="width:80%;">
+  <div class="container centered" style="width:80%;">
+
+   <div class="columns col-oneline">
+    <div class="column col-3"><button style="width: 100%" onclick="make_new_frame()">Create New Frame</button></div>
+    <div class="column col-3"><button style="width: 100%" onclick="load_previous_frame()">Previous Frame</button></div>
+    <div class="column col-3"><button style="width: 100%" onclick="load_next_frame()">Next Frame</button></div>
+    <div class="column col-3"><button style="width: 100%" onclick="send_animation()">Save Animation</button></div>
+   </div>
    <div class="columns">
     <div class="column col-12">
-     <canvas id="canvas" width="700" height="140"></canvas>
+     <canvas class="centered" id="canvas" width="700" height="140"></canvas>
     </div>
    </div>
    <div class="columns col-oneline">
-    <div class="column col-3"><button onclick="shift_right()">shift right</button></div>
-    <div class="column col-3">two</div>
-    <div class="column col-3">three</div>
-    <div class="column col-3">four</div>
+    <div class="column col-1"><input class="jscolor {onFineChange:'set_current_colour(this.rgb)'}" value="cc66ff" style="width: 100%"></div>
+    <div class="column col-1"><button style="width: 100%" onclick=""></button></div>
+    <div class="column col-1"><button style="width: 100%" onclick=""></button></div>
+   </div>
+   <div class="columns col-oneline">
+    <div class="column col-3"><button style="width: 100%" onclick="">Button</button></div>
+    <div class="column col-3"><button style="width: 100%" onclick="">Button</button></div>
+    <div class="column col-3"><button style="width: 100%" onclick="">Button</button></div>
+    <div class="column col-3"><button style="width: 100%" onclick="shift_right()">shift right</button></div>
    </div>
   </div> 
  </body>
