@@ -17,6 +17,7 @@
     var current_colour = "";
 
     function draw_blank_grid() {
+      // Draw a blank grid in the canvas
       if (canvas.getContext) {
         var ctx = canvas.getContext('2d');
 
@@ -32,6 +33,7 @@
     }
 
     function draw_grid_from_pixels() {
+      // Draw out the currently stored pixels in the current frame onto the browser canvas
       var ctx = canvas.getContext('2d');
       ctx.fillStyle="#000000";
       ctx.fillRect(0,0, canvas.width, canvas.height);
@@ -52,6 +54,7 @@
     }
 
     function init_pixel_grid() {
+      // Initialise a blank (all black) grid of pixels
       var blank_pixel_grid = [];
       for (var x = 0; x < pixel_grid_x; x++){
         blank_pixel_grid[x] = [];
@@ -63,16 +66,19 @@
     }
 
     function init_frame_store() {
+      // Init the frame store
       frame_store[0] = pixel_grid;
     }
 
     function shift_pixel_grid_right(){
+      // Shift all pixels to the right
       new_array = pixel_grid.slice(0, -1);
       new_array.splice(0, 0, pixel_grid[pixel_grid_x - 1]);
       pixel_grid = new_array;
     }
 
     function doMouseDown(event) {
+      // Handle mouse down event on the canvas
       var rect = canvas.getBoundingClientRect();
       var screen_x = event.clientX - rect.left;
       var screen_y = event.clientY - rect.top;
@@ -98,6 +104,7 @@
     }
 
     function init() {
+      // Init the JS app
       canvas = document.getElementById('canvas');
 
       draw_blank_grid();
@@ -107,6 +114,7 @@
     }
 
     function shift_right() {
+      // shift pixels and refresh the UI
       shift_pixel_grid_right();
       draw_grid_from_pixels();
     }
