@@ -11,26 +11,9 @@
     const pixel_screen_multiplier = 20 // how many screen pixels to one real world pixel
 
     var canvas;
-    var pixel_grid = [];
     var frame_store = [];
-    var current_frame = 0;
+    var current_frame_number = 0;
     var current_colour = "";
-
-    function draw_blank_grid() {
-      // Draw a blank grid in the canvas
-      if (canvas.getContext) {
-        var ctx = canvas.getContext('2d');
-
-        ctx.fillStyle="#000000";
-        ctx.fillRect(0,0, canvas.width, canvas.height);
-        ctx.strokeStyle="#FFFFFF";
-        for (var y = 0; y < pixel_grid_y; y++){
-          for (var x = 0; x < pixel_grid_x; x++){
-            ctx.strokeRect(x*pixel_screen_multiplier, y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
-          }
-        }
-      }
-    }
 
     function draw_grid_from_pixels() {
       // Draw out the currently stored pixels in the current frame onto the browser canvas
@@ -40,8 +23,9 @@
       
       for (var pixel_y = 0; pixel_y < pixel_grid_y; pixel_y++){
         for (var pixel_x = 0; pixel_x < pixel_grid_x; pixel_x++){
-          if (pixel_grid[pixel_x][pixel_y] !== "0,0,0") {
-            ctx.fillStyle="rgb(" + pixel_grid[pixel_x][pixel_y] + ")";
+          var current_frame = frame_store[current_frame_number];
+          if (current_frame[pixel_x][pixel_y] !== "0,0,0") {
+            ctx.fillStyle="rgb(" + current_frame[pixel_x][pixel_y] + ")";
             ctx.fillRect(pixel_x*pixel_screen_multiplier, pixel_y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
           } else {
             ctx.fillStyle="#000000";
@@ -65,16 +49,11 @@
       return blank_pixel_grid;
     }
 
-    function init_frame_store() {
-      // Init the frame store
-      frame_store[0] = pixel_grid;
-    }
-
     function shift_pixel_grid_right(){
       // Shift all pixels to the right
-      new_array = pixel_grid.slice(0, -1);
-      new_array.splice(0, 0, pixel_grid[pixel_grid_x - 1]);
-      pixel_grid = new_array;
+      var new_array = frame_store[current_frame_number].slice(0, -1);
+      new_array.splice(0, 0, frame_store[current_frame_number][pixel_grid_x - 1]);
+      frame_store[current_frame_number] = new_array;
     }
 
     function doMouseDown(event) {
@@ -86,14 +65,14 @@
       var pixel_y = Math.floor(screen_y/pixel_screen_multiplier)
       //console.log("X:" + Math.floor(clicked_x/20) + ", Y:" + Math.floor(clicked_y/20) + ", was clicked");
       var ctx = canvas.getContext('2d');
-      if (pixel_grid[pixel_x][pixel_y] === "0,0,0") {
-        pixel_grid[pixel_x][pixel_y] = current_colour;
+      if (frame_store[current_frame_number][pixel_x][pixel_y] === "0,0,0") {
+        frame_store[current_frame_number][pixel_x][pixel_y] = current_colour;
         ctx.fillStyle = "rgb(" + current_colour + ")";
         ctx.fillRect(pixel_x*pixel_screen_multiplier, pixel_y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
       } else {
         ctx.fillStyle="#000000";
         ctx.strokeStyle="#FFFFFF";
-        pixel_grid[pixel_x][pixel_y] = "0,0,0";
+        frame_store[current_frame_number][pixel_x][pixel_y] = "0,0,0";
         ctx.fillRect(pixel_x*pixel_screen_multiplier, pixel_y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
         ctx.strokeRect(pixel_x*pixel_screen_multiplier, pixel_y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
       }
@@ -107,9 +86,9 @@
       // Init the JS app
       canvas = document.getElementById('canvas');
 
-      draw_blank_grid();
-      pixel_grid = init_pixel_grid();
-      init_frame_store()
+      frame_store[current_frame_number] = init_pixel_grid();
+      draw_grid_from_pixels();
+
       canvas.addEventListener('mousedown', doMouseDown);
     }
 
@@ -120,31 +99,31 @@
     }
 
     function load_next_frame() {
-      if (frame_store.length - 1 === current_frame) {
+      if (frame_store.length - 1 === current_frame_number) {
         // We are at the end of the frames
         console.log("No more frames! Maybe make a new one?")
       }
       else {
-        current_frame++;
-        pixel_grid = frame_store[current_frame];
+        current_frame_number++;
       }
       draw_grid_from_pixels();
     }
 
     function load_previous_frame() {
-      current_frame--;
-      pixel_grid = frame_store[current_frame];
+      current_frame_number--;
       draw_grid_from_pixels();
     }
 
     function make_new_frame() {
-      frame_store[current_frame + 1] = init_pixel_grid();
+      frame_store[current_frame_number + 1] = init_pixel_grid();
     }
 
     function send_animation() {
+      var animation = {frames:frame_store, name:"test"}
       var xhttp = new XMLHttpRequest();
-      xhttp.open("POST", "127.0.0.1:5000/postdata", true);
-      xhttp.send("{\"bob\":\"fish\"}");
+      xhttp.open("POST", "/save-animation", true);
+      xhttp.setRequestHeader("Content-Type", "application/json");
+      xhttp.send(JSON.stringify(animation));
     }
 
   </script>

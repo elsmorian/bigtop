@@ -1,20 +1,31 @@
 from flask import Flask, request, render_template
 import json
- 
+
+ANNIMATION_PATH="/opt/hat_server/annimations/"
+
 app = Flask(__name__)
  
 @app.route('/')
 def index():
-	return "Flask server"
+    """Show a list of animations available"""
+    return "Hat server"
 
 @app.route('/edit-animation')
 def edit_animation():
-	return render_template('edit_animation.html')
+    """Show the editor for an animation"""
+    return render_template('edit_animation.html')
  
-@app.route('/postdata', methods = ['POST'])
-def postdata():
+@app.route('/save-animation', methods = ['POST'])
+def save_animation():
+    """Take an animation and save it."""
+    #import ipdb; ipdb.set_trace()
     data = request.get_json()
-    print(data)
+    annimation_name = data["name"]
+    print("NAME: {}".format(annimation_name))
+
+    filename = "{}{}.json".format(ANNIMATION_PATH, annimation_name)
+    with open(filename, 'w') as outfile:
+        json.dump(data, outfile)
     # do something with this data variable that contains the data from the node server
     return json.dumps({"newdata":"hereisthenewdatayouwanttosend"})
  
