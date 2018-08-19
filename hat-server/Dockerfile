@@ -1,6 +1,6 @@
 FROM alpine:3.8
 
-RUN mkdir -p /opt/hat_server/annimations && \
+RUN mkdir -p /opt/hat_server/animations && \
     cd /opt/hat_server/ && \
     apk add --no-cache python3 && \
     pip3 install flask===1.0.2 ipdb ipython pudb

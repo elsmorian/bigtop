@@ -8,8 +8,8 @@ NUM_PIXELS = 240
 
 DATA_PIN = 23
 CLOCK_PIN = 24
-
-ANNIMATION_FILE = "/opt/annimations/test.json"
+ANIMATION_PATH = "/opt/hat_server/animations/"
+STATUS_FILE = "{}current.status".format(ANIMATION_PATH)
 
 hat = Adafruit_DotStar(NUM_PIXELS, DATA_PIN, CLOCK_PIN, order='bgr')
 
@@ -19,10 +19,15 @@ hat.setBrightness(16)
 
 while True:
 
+    status = None
+    with open(STATUS_FILE, 'r') as statusfile:
+        status = json.loads(statusfile.read())
+
     annimation = None
-    with open(ANNIMATION_FILE, 'r') as infile:
+    animation_file = "{}{}.json".format(ANIMATION_PATH, status.name)
+    with open(animation_file, 'r') as infile:
         annimation = json.loads(infile.read())
-    
+
     fps = 1
     for frame in annimation['frames']:
         # munge frame array into list of pixels

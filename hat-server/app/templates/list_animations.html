@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link rel="stylesheet" href="static/css/spectre.min.css">
+  <script type="application/javascript">
+    function make_animation_active(name) {
+      var json = {name:name}
+      var xhttp = new XMLHttpRequest();
+      xhttp.open("POST", "/make-animation-active", true);
+      xhttp.setRequestHeader("Content-Type", "application/json");
+      xhttp.send(JSON.stringify(animation));
+    }
+  </script>
+ </head>
+ <body>
+  <div class="container centered" style="width:80%;">
+
+   <div class="columns col-oneline">
+    <h1>HQ</h1>
+   </div>
+   <div class="columns col-oneline">
+      <div class="column col-3"><a class="btn" href="edit-animation">Create New Animation</a></div>
+   </div>
+   <hr>
+
+   <table>
+     <tr><td><h3>Name</h3></td><td></td><td></td></tr>
+     {% for animation in animations %}
+     <tr>
+       <td>{{ animation }}</td>
+       <td><a class="btn" href="edit-animation?name={{ animation }}">Edit</a></td>
+       <td><a class="btn btn-success" onclick="make_animation_active({{ animation }})">Run</a></td>
+     </tr>
+     {% endfor %}
+   </table>
+
+  </div> 
+ </body>
+</html>

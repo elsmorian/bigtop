@@ -6,12 +6,16 @@
   <script src="static/js/jscolor.js"></script>
   <script type="application/javascript">
 
+    var existing_animation = JSON.parse('{{ animation_data | tojson | safe}}');
+
+
     const pixel_grid_x = 35 // number of pixels along width 
     const pixel_grid_y = 7 // number of pixels along height
     const pixel_screen_multiplier = 20 // how many screen pixels to one real world pixel
 
     var canvas;
     var frame_store = [];
+    var animation_name = "";
     var current_frame_number = 0;
     var current_colour = "";
 
@@ -84,12 +88,21 @@
 
     function init() {
       // Init the JS app
+
       canvas = document.getElementById('canvas');
-
-      frame_store[current_frame_number] = init_pixel_grid();
-      draw_grid_from_pixels();
-
       canvas.addEventListener('mousedown', doMouseDown);
+
+      var name_input = document.getElementById("animation_name");
+
+      if (existing_animation.name === undefined) {
+        frame_store[current_frame_number] = init_pixel_grid();
+      } else {
+        frame_store = existing_animation.frames;
+        animation_name = existing_animation.name;
+        document.getElementById('animation_name').value = animation_name;
+      }
+
+      draw_grid_from_pixels();
     }
 
     function shift_right() {
@@ -119,11 +132,15 @@
     }
 
     function send_animation() {
-      var animation = {frames:frame_store, name:"test"}
+      var animation = {frames:frame_store, name:animation_name}
       var xhttp = new XMLHttpRequest();
       xhttp.open("POST", "/save-animation", true);
       xhttp.setRequestHeader("Content-Type", "application/json");
       xhttp.send(JSON.stringify(animation));
+    }
+
+    function update_animation_name(value) {
+      animation_name = value;
     }
 
   </script>
@@ -135,7 +152,6 @@
     <div class="column col-3"><button style="width: 100%" onclick="make_new_frame()">Create New Frame</button></div>
     <div class="column col-3"><button style="width: 100%" onclick="load_previous_frame()">Previous Frame</button></div>
     <div class="column col-3"><button style="width: 100%" onclick="load_next_frame()">Next Frame</button></div>
-    <div class="column col-3"><button style="width: 100%" onclick="send_animation()">Save Animation</button></div>
    </div>
    <div class="columns">
     <div class="column col-12">
@@ -152,6 +168,13 @@
     <div class="column col-3"><button style="width: 100%" onclick="">Button</button></div>
     <div class="column col-3"><button style="width: 100%" onclick="">Button</button></div>
     <div class="column col-3"><button style="width: 100%" onclick="shift_right()">shift right</button></div>
+   </div>
+   <hr>
+   <div class="columns col-oneline"></div>
+    <div class="column col-3"><a class="btn" href="/">Animation List</a></div>
+    <div class="column col-1"></div>
+    <div class="column col-5"><label>Name</label><input id="animation_name" type="text" onchange="update_animation_name(this.value)"></input>
+    <div class="column col-3"><a class="btn" onclick="send_animation()">Save Animation</a></div>
    </div>
   </div> 
  </body>
