@@ -22,13 +22,8 @@ def index():
 @app.route('/make-animation-active', methods = ['POST'])
 def make_animation_active():
     """Make an animation active."""
-    data = request.get_json()
-    status = {
-        "name": data["name"],
-        "type": "run_single",
-    }
     with open(STATUS_FILE, 'w') as outfile:
-        json.dump(status, outfile)
+        json.dump(request.get_json(), outfile)
     return json.dumps({"status":"ok"})
 
 @app.route('/edit-animation')
