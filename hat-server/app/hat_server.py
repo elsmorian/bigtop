@@ -6,6 +6,7 @@ from flask import Flask, request, render_template
 
 
 ANIMATION_PATH = "/opt/hat_server/animations/"
+STATUS_FILE = "{}current.status".format(ANIMATION_PATH)
 
 app = Flask(__name__)
  
@@ -26,7 +27,7 @@ def make_animation_active():
         "name": data["name"],
         "type": "run_single",
     }
-    with open("current.status", 'w') as outfile:
+    with open(STATUS_FILE, 'w') as outfile:
         json.dump(status, outfile)
     return json.dumps({"status":"ok"})
 
