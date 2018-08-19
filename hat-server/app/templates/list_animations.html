@@ -5,11 +5,11 @@
   <link rel="stylesheet" href="static/css/spectre.min.css">
   <script type="application/javascript">
     function make_animation_active(name) {
-      var json = {name:name}
+      var data = {name:name}
       var xhttp = new XMLHttpRequest();
       xhttp.open("POST", "/make-animation-active", true);
       xhttp.setRequestHeader("Content-Type", "application/json");
-      xhttp.send(JSON.stringify(animation));
+      xhttp.send(JSON.stringify(data));
     }
   </script>
  </head>
@@ -30,7 +30,7 @@
      <tr>
        <td>{{ animation }}</td>
        <td><a class="btn" href="edit-animation?name={{ animation }}">Edit</a></td>
-       <td><a class="btn btn-success" onclick="make_animation_active({{ animation }})">Run</a></td>
+       <td><a class="btn btn-success" onclick="make_animation_active({{ '"' ~ animation ~ '"'}})">Run</a></td>
      </tr>
      {% endfor %}
    </table>
