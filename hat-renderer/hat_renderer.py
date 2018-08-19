@@ -23,8 +23,14 @@ while True:
     with open(STATUS_FILE, 'r') as statusfile:
         status = json.loads(statusfile.read())
 
+    if (status['type'] == "off"):
+        hat.clear()
+        hat.show()
+        time.sleep(2)
+        continue
+    
     annimation = None
-    animation_file = "{}{}.json".format(ANIMATION_PATH, status.name)
+    animation_file = "{}{}.json".format(ANIMATION_PATH, status['name'])
     with open(animation_file, 'r') as infile:
         annimation = json.loads(infile.read())
 

@@ -24,7 +24,7 @@ def make_animation_active():
     data = request.get_json()
     status = {
         "name": data["name"],
-        "type": "single",
+        "type": "run_single",
     }
     with open("current.status", 'w') as outfile:
         json.dump(status, outfile)
