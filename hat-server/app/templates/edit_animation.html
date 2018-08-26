@@ -9,9 +9,9 @@
     var existing_animation = JSON.parse('{{ animation_data | tojson | safe}}');
 
 
-    const pixel_grid_x = 35 // number of pixels along width 
-    const pixel_grid_y = 7 // number of pixels along height
-    const pixel_screen_multiplier = 20 // how many screen pixels to one real world pixel
+    const pixel_grid_x = 36; // number of pixels along width 
+    const pixel_grid_y = 9; // number of pixels along height
+    const pixel_screen_multiplier = 20; // how many screen pixels to one real world pixel
 
     var canvas;
     var frame_store = [];
@@ -24,10 +24,10 @@
       var ctx = canvas.getContext('2d');
       ctx.fillStyle="#000000";
       ctx.fillRect(0,0, canvas.width, canvas.height);
-      
+      var current_frame = frame_store[current_frame_number];
+
       for (var pixel_y = 0; pixel_y < pixel_grid_y; pixel_y++){
         for (var pixel_x = 0; pixel_x < pixel_grid_x; pixel_x++){
-          var current_frame = frame_store[current_frame_number];
           if (current_frame[pixel_x][pixel_y] !== "0,0,0") {
             ctx.fillStyle="rgb(" + current_frame[pixel_x][pixel_y] + ")";
             ctx.fillRect(pixel_x*pixel_screen_multiplier, pixel_y*pixel_screen_multiplier, pixel_screen_multiplier, pixel_screen_multiplier);
@@ -130,6 +130,11 @@
     function make_new_frame() {
       frame_store[current_frame_number + 1] = init_pixel_grid();
     }
+    
+    function copy_from_last_frame() {
+      frame_store[current_frame_number] = frame_store[current_frame_number - 1];
+      draw_grid_from_pixels();
+    }
 
     function send_animation() {
       var animation = {frames:frame_store, name:animation_name}
@@ -152,10 +157,11 @@
     <div class="column col-3"><button style="width: 100%" onclick="make_new_frame()">Create New Frame</button></div>
     <div class="column col-3"><button style="width: 100%" onclick="load_previous_frame()">Previous Frame</button></div>
     <div class="column col-3"><button style="width: 100%" onclick="load_next_frame()">Next Frame</button></div>
+    <div class="column col-3"><button style="width: 100%" onclick="copy_from_last_frame()">Copy From Last Frame</button></div>
    </div>
    <div class="columns">
     <div class="column col-12">
-     <canvas class="centered" id="canvas" width="700" height="140"></canvas>
+     <canvas class="centered" id="canvas" width="720" height="180"></canvas>
     </div>
    </div>
    <div class="columns col-oneline">

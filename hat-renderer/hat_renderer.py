@@ -4,7 +4,7 @@ import atexit
 
 from dotstar import Adafruit_DotStar
 
-NUM_PIXELS = 240
+NUM_PIXELS = 324
 
 DATA_PIN = 23
 CLOCK_PIN = 24
@@ -34,7 +34,7 @@ while True:
     with open(animation_file, 'r') as infile:
         annimation = json.loads(infile.read())
 
-    fps = 1
+    fps = 15
     for frame in annimation['frames']:
         # munge frame array into list of pixels
         frame_width = len(frame)
